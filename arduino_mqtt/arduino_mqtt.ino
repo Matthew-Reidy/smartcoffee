@@ -86,23 +86,23 @@ void onMessageReceived(int messageSize) {
     payloadString += (char)mqttClient.read();
   }
     Serial.print(payloadString);
-    // JSONVar payload = JSON.parse(payloadString);
+    JSONVar payload = JSON.parse(payloadString);
 
-    // if(topic == "coffee/brew"){
-    //   if(payload.hasOwnProperty("message") && (String)payload["message"] == "start"){
-    //     digitalWrite(relay_pin, LOW);
-    //     brewBeginTime = millis();
-    //     return;
-    //   }
+    if(topic == "coffee/brew"){
+      if(payload.hasOwnProperty("message") && (String)payload["message"] == "start"){
+        digitalWrite(relay_pin, LOW);
+        brewBeginTime = millis();
+        return;
+      }
 
-    //     digitalWrite(relay_pin, HIGH);
-    //     brewBeginTime = 0;
+        digitalWrite(relay_pin, HIGH);
+        brewBeginTime = 0;
 
-    // }
+    }
 
-    // if (topic == "ping/pong"){
-    //     publishMessage(topic);
-    // }
+    if (topic == "ping/pong"){
+        publishMessage(topic);
+    }
 
 }
 
