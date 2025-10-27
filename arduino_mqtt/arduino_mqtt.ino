@@ -30,16 +30,16 @@ void setup() {
 
   sslClient.setEccSlot(0, SECRET_CERTIFICATE);
 
-
- 
   mqttClient.onMessage(onMessageReceived);
 }
 
 void connectWiFi() {
+
   Serial.print("Attempting to connect to SSID: ");
   Serial.print(WIFI_SSID);
   Serial.print(" ");
   int status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
   while (status != WL_CONNECTED) {
     // failed, retry
     Serial.print("attempting...");
@@ -51,6 +51,7 @@ void connectWiFi() {
 }
 
 void connectMQTT() {
+
   Serial.print("Attempting to MQTT broker: ");
   Serial.print(IOT_BROKER);
   Serial.println(" ");
@@ -80,10 +81,13 @@ void onMessageReceived(int messageSize) {
 
   String topic = mqttClient.messageTopic();
   String payloadString = "";
+
   while (mqttClient.available()) {
+
     Serial.print(topic);
     Serial.print((char)mqttClient.read());
     payloadString += (char)mqttClient.read();
+    
   }
     Serial.print(payloadString);
     JSONVar payload = JSON.parse(payloadString);

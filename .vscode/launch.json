@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:smartcoffee}/IOS",
+            "name": "Debug MyCLI (IOS)",
+            "program": "${workspaceFolder:smartcoffee}/IOS/.build/debug/MyCLI",
+            "preLaunchTask": "swift: Build Debug MyCLI (IOS)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:smartcoffee}/IOS",
+            "name": "Release MyCLI (IOS)",
+            "program": "${workspaceFolder:smartcoffee}/IOS/.build/release/MyCLI",
+            "preLaunchTask": "swift: Build Release MyCLI (IOS)"
+        }
+    ]
+}
