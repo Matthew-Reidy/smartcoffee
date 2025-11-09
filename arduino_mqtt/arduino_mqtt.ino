@@ -11,7 +11,7 @@ BearSSLClient sslClient(wifiClient); // Used for SSL/TLS connection, integrates 
 MqttClient    mqttClient(sslClient);
 
 unsigned long brewBeginTime = 0;
-const int relay_pin = 1;
+const int relay_pin = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -37,22 +37,21 @@ void connectWiFi() {
 
   Serial.print("Attempting to connect to SSID: ");
   Serial.print(WIFI_SSID);
-  Serial.print(" ");
+  
   int status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   while (status != WL_CONNECTED) {
     // failed, retry
-    Serial.print("attempting...");
+    Serial.println("attempting...");
     delay(5000);
   }
  
   Serial.println("You're connected to the network");
-  Serial.println();
 }
 
 void connectMQTT() {
 
-  Serial.print("Attempting to MQTT broker: ");
+  Serial.print("Attempting to connect to MQTT broker: ");
   Serial.print(IOT_BROKER);
   Serial.println(" ");
 
@@ -80,40 +79,63 @@ unsigned long getTime() {
 void onMessageReceived(int messageSize) {
 
   String topic = mqttClient.messageTopic();
-  String payloadString = "";
+  Serial.println(topic);
 
-  while (mqttClient.available()) {
+  char buf[messageSize + 1];
 
-    Serial.print(topic);
-    Serial.print((char)mqttClient.read());
-    payloadString += (char)mqttClient.read();
+  mqttClient.readBytes(buf, messageSize);
+
+  buf[messageSize] = '\0';
+
+  JSONVar payload = JSON.parse(buf);
+
+  Serial.println(payload);
+  Serial.println(payload["message"]);
+
+  if(payload.hasOwnProperty("message")){
     
-  }
-    Serial.print(payloadString);
-    JSONVar payload = JSON.parse(payloadString);
-
     if(topic == "coffee/brew"){
-      if(payload.hasOwnProperty("message") && (String)payload["message"] == "start"){
-        digitalWrite(relay_pin, LOW);
-        brewBeginTime = millis();
-        return;
-      }
+        
+        if(String((const char*)payload["message"]) == "start"){
+          digitalWrite(relay_pin, LOW);
+          brewBeginTime = millis();
+          return;
+        }
 
         digitalWrite(relay_pin, HIGH);
         brewBeginTime = 0;
-
     }
 
-    if (topic == "ping/pong"){
+
+    if(topic == "ping/pong"){
+
+        if(String((const char*)payload["message"]) == "pong"){
+
+          Serial.println("pong recieved. breaking out");
+          return;
+
+        }
+
+        Serial.println("ping/pong topic message recieved. sending message");
         publishMessage(topic);
+      
     }
+
+  }
 
 }
 
 void publishMessage(String topic){
 
-  mqttClient.beginMessage(topic);
-  mqttClient.print("pong");
+  JSONVar response; 
+
+  response["message"] = "pong";
+
+  mqttClient.beginMessage(topic, false, 0, false);
+  
+  mqttClient.print(JSON.stringify(response));
+
+  mqttClient.endMessage();
 
 }
 
