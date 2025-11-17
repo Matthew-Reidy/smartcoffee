@@ -10,11 +10,6 @@ def lambda_handler(event, context):
 
     connectionId : str = event["requestContext"]["connectionId"]
 
-    coffeemaker = "coffeemaker/topic"
-
-    client.publish(topic=coffeemaker, payload="my message")
-
-    
     match event["requestContext"]["eventType"]:
         
         case "CONNECT":
@@ -24,7 +19,12 @@ def lambda_handler(event, context):
          
         case "MESSAGE":
 
-            print("valid session...distributing messages")
+            coffeemaker = "coffee/brew"
+
+            client.publish(topic=coffeemaker, payload="my message")
+            
+        case _:  # Default case, will resolve for events eminating from IOT Core
+
             sendMessage(event["body"], connectionId)
 
     return {

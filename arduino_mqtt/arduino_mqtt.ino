@@ -35,8 +35,8 @@ void setup() {
 
 void connectWiFi() {
 
-  Serial.print("Attempting to connect to SSID: ");
-  Serial.print(WIFI_SSID);
+  Serial.println("Attempting to connect to SSID: ");
+  Serial.println(WIFI_SSID);
   
   int status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -51,8 +51,8 @@ void connectWiFi() {
 
 void connectMQTT() {
 
-  Serial.print("Attempting to connect to MQTT broker: ");
-  Serial.print(IOT_BROKER);
+  Serial.println("Attempting to connect to MQTT broker: ");
+  Serial.println(IOT_BROKER);
   Serial.println(" ");
 
   while (!mqttClient.connect(IOT_BROKER, 8883)) {
@@ -95,8 +95,8 @@ void onMessageReceived(int messageSize) {
   if(payload.hasOwnProperty("message")){
     
     if(topic == "coffee/brew"){
-        
-        if(String((const char*)payload["message"]) == "start"){
+
+        if(strcmp((const char*)payload["message"], "start") == 0){
           digitalWrite(relay_pin, LOW);
           brewBeginTime = millis();
           return;
@@ -109,7 +109,7 @@ void onMessageReceived(int messageSize) {
 
     if(topic == "ping/pong"){
 
-        if(String((const char*)payload["message"]) == "pong"){
+        if(strcmp((const char*)payload["message"], "pong") == 0){
 
           Serial.println("pong recieved. breaking out");
           return;
